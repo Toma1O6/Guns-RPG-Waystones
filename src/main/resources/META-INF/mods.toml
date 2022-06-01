@@ -7,6 +7,7 @@ modId="grpgwaystones"
 version="${file.jarVersion}"
 displayName="GunsRPG Waystones"
 authors="Toma,Tomano123"
+updateJSONURL="https://raw.githubusercontent.com/Toma1O6/Guns-RPG-Waystones/master/update.json"
 description='''
 Addon mod for GUNSRPG. Adds new way of travelling via waystones
 '''
