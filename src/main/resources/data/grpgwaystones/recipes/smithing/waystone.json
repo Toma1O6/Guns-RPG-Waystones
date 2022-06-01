@@ -1,0 +1,33 @@
+{
+    "type": "gunsrpg:smithing_table",
+    "pattern": [
+        " s ",
+        "ece",
+        "bbb"
+    ],
+    "key": {
+        "b": {
+            "item": "minecraft:stone_bricks"
+        },
+        "e": {
+            "item": "minecraft:ender_eye"
+        },
+        "c": {
+            "tag": "gunsrpg:crystal/crystals"
+        },
+        "s": {
+            "item": "minecraft:stone_brick_slab"
+        }
+    },
+    "result": {
+        "item": "grpgwaystones:waystone"
+    },
+    "requirements": [
+        {
+            "type": "gunsrpg:skill",
+            "predicate": {
+                "skill": "grpgwaystones:waystones"
+            }
+        }
+    ]
+}

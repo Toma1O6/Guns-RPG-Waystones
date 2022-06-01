@@ -1,0 +1,40 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="All rights reserved"
+
+[[mods]]
+modId="grpgwaystones"
+version="${file.jarVersion}"
+displayName="GunsRPG Waystones"
+authors="Toma,Tomano123"
+description='''
+Addon mod for GUNSRPG. Adds new way of travelling via waystones
+'''
+
+[[dependencies.grpgwaystones]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36.2.20,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.grpgwaystones]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.5,1.17)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.grpgwaystones]]
+    modId="gunsrpg"
+    mandatory=true
+    versionRange="[1.0.5.107,1.0.6)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.grpgwaystones]]
+    modId="configuration"
+    mandatory=true
+    versionRange="[1.2.5,1.2.6)"
+    ordering="NONE"
+    side="BOTH"

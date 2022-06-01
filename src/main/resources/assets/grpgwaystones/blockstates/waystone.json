@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "lower=false,active=false": {
+            "model": "grpgwaystones:block/waystone_upper"
+        },
+        "lower=true,active=false": {
+            "model": "grpgwaystones:block/waystone_lower"
+        },
+        "lower=false,active=true": {
+            "model": "grpgwaystones:block/waystone_upper"
+        },
+        "lower=true,active=true": {
+            "model": "grpgwaystones:block/waystone_lower"
+        }
+    }
+}

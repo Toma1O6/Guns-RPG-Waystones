@@ -1,0 +1,64 @@
+{
+    "type": "grpgwaystones:activate_waystone",
+    "tier": 1,
+    "isSpecial": true,
+    "display": {
+        "name": "Waystone activation",
+        "info": "Survive in area for 5 minutes"
+    },
+    "data": {
+        "duration": "5m",
+        "area": {
+            "size": 20,
+            "distance": 0,
+            "spawnInterval": 50,
+            "spawners": [
+                {
+                    "entity": "minecraft:spider",
+                    "propability": 0.05,
+                    "limit": 3
+                },
+                {
+                    "entity": "minecraft:zombie",
+                    "propability": 0.05,
+                    "limit": 3
+                },
+                {
+                    "entity": "minecraft:creeper",
+                    "propability": 0.05,
+                    "limit": 3
+                },
+                {
+                    "entity": "minecraft:skeleton",
+                    "propability": 0.05,
+                    "limit": 3
+                },
+                {
+                    "entity": "minecraft:witch",
+                    "propability": 0.05,
+                    "limit": 3
+                },
+                {
+                    "entity": "minecraft:wither_skeleton",
+                    "propability": 0.05,
+                    "limit": 3
+                },
+                {
+                    "entity": "gunsrpg:zombie_gunner",
+                    "propability": 0.05,
+                    "limit": 2
+                },
+                {
+                    "entity": "gunsrpg:explosive_skeleton",
+                    "propability": 0.05,
+                    "limit": 2
+                },
+                {
+                    "entity": "gunsrpg:bloodmoon_golem",
+                    "propability": 0.05,
+                    "limit": 2
+                }
+            ]
+        }
+    }
+}
