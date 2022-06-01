@@ -67,6 +67,7 @@ public class ActivateWaystoneQuest extends Quest<ActivateWaystoneData> implement
     public void registerTriggers(ITriggerRegistration registration) {
         registration.addEntry(Trigger.TICK, this::onTick, this::handleSuccessfulTick);
         registration.addEntry(Trigger.PLAYER_DIED, this::handlePlayerDeath, ITriggerHandler.NONE);
+        registration.addEntry(Waystones.BLOCK_DESTROYED, this::onBlockBroken, ITriggerHandler.NONE);
     }
 
     @Override
@@ -162,6 +163,19 @@ public class ActivateWaystoneQuest extends Quest<ActivateWaystoneData> implement
 
     private TriggerResponseStatus handlePlayerDeath(Trigger trigger, IPropertyReader reader) {
         return TriggerResponseStatus.FAIL;
+    }
+
+    private TriggerResponseStatus onBlockBroken(Trigger trigger, IPropertyReader reader) {
+        PlayerEntity player = reader.getProperty(QuestProperties.PLAYER);
+        BlockState state = reader.getProperty(Waystones.BLOCKSTATE);
+        if (state.getBlock() != ModdedBlocks.WAYSTONE) {
+            return TriggerResponseStatus.OK;
+        }
+        BlockState atWaystone = player.level.getBlockState(waystonePosition);
+        if (atWaystone.getBlock() != ModdedBlocks.WAYSTONE) {
+            return TriggerResponseStatus.FAIL;
+        }
+        return TriggerResponseStatus.OK;
     }
 
     private boolean isGracePeriod() {
