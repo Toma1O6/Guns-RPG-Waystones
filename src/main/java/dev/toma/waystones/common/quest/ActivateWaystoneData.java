@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import dev.toma.gunsrpg.common.quests.quest.IQuestData;
 import dev.toma.gunsrpg.common.quests.quest.QuestType;
+import dev.toma.gunsrpg.common.quests.quest.area.IQuestAreaProvider;
 import dev.toma.gunsrpg.common.quests.quest.area.QuestAreaScheme;
 import dev.toma.gunsrpg.util.IIntervalProvider;
 import dev.toma.gunsrpg.util.Interval;
@@ -12,7 +13,7 @@ import dev.toma.gunsrpg.util.helper.JsonHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.JSONUtils;
 
-public class ActivateWaystoneData implements IQuestData {
+public class ActivateWaystoneData implements IQuestData, IQuestAreaProvider {
 
     private final int ticks;
     private final QuestAreaScheme scheme;
@@ -26,6 +27,7 @@ public class ActivateWaystoneData implements IQuestData {
         return ticks;
     }
 
+    @Override
     public QuestAreaScheme getAreaScheme() {
         return this.scheme;
     }

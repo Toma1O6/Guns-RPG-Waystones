@@ -29,7 +29,7 @@ Addon mod for GUNSRPG. Adds new way of travelling via waystones
 [[dependencies.grpgwaystones]]
     modId="gunsrpg"
     mandatory=true
-    versionRange="[1.0.5.110,1.0.6)"
+    versionRange="[1.0.5.115,1.0.6)"
     ordering="NONE"
     side="BOTH"
 

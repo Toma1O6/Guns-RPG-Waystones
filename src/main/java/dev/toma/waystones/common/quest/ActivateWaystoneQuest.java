@@ -6,7 +6,6 @@ import dev.toma.gunsrpg.common.capability.PlayerData;
 import dev.toma.gunsrpg.common.init.ModSounds;
 import dev.toma.gunsrpg.common.quests.QuestProperties;
 import dev.toma.gunsrpg.common.quests.quest.*;
-import dev.toma.gunsrpg.common.quests.quest.area.IAreaQuest;
 import dev.toma.gunsrpg.common.quests.quest.area.QuestArea;
 import dev.toma.gunsrpg.common.quests.quest.area.QuestAreaScheme;
 import dev.toma.gunsrpg.common.quests.trigger.ITriggerHandler;
@@ -32,7 +31,7 @@ import net.minecraftforge.common.util.Constants;
 
 import java.util.UUID;
 
-public class ActivateWaystoneQuest extends Quest<ActivateWaystoneData> implements IAreaQuest {
+public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaystoneData> {
 
     public static final ResourceLocation SCHEME_LOCATION = new ResourceLocation(Waystones.MODID, "activate_waystone");
 
@@ -42,9 +41,6 @@ public class ActivateWaystoneQuest extends Quest<ActivateWaystoneData> implement
     public static final ITextComponent ACTIVATE_FAILURE = new TranslationTextComponent("quest.activate_waystone.fail").withStyle(TextFormatting.RED);
 
     private int timeLeft;
-    private int gracePeriod = 100;
-    private boolean wasInArea;
-    private QuestArea area;
     private BlockPos waystonePosition;
 
     public ActivateWaystoneQuest(QuestScheme<ActivateWaystoneData> scheme, UUID traderId) {
@@ -58,31 +54,20 @@ public class ActivateWaystoneQuest extends Quest<ActivateWaystoneData> implement
 
     public void setWaystonePosition(BlockPos waystonePos) {
         this.waystonePosition = waystonePos;
-        QuestAreaScheme scheme = this.getActiveData().getAreaScheme();
-        this.area = new QuestArea(scheme, waystonePos);
+        ActivateWaystoneData data = this.getActiveData();
+        this.area = generateArea(data);
         trySyncClient();
     }
 
     @Override
-    public void registerTriggers(ITriggerRegistration registration) {
-        registration.addEntry(Trigger.TICK, this::onTick, this::handleSuccessfulTick);
-        registration.addEntry(Trigger.PLAYER_DIED, this::handlePlayerDeath, ITriggerHandler.NONE);
+    protected void registerAdditionalTriggers(ITriggerRegistration registration) {
         registration.addEntry(Waystones.BLOCK_DESTROYED, this::onBlockBroken, ITriggerHandler.NONE);
     }
 
     @Override
-    public void tickQuest(PlayerEntity player) {
-        if (this.getStatus() == QuestStatus.ACTIVE && area != null && area.isInArea(player)) {
-            area.tickArea(player.level, player);
-        }
-        if (gracePeriod > 0) {
-            --gracePeriod;
-        }
-    }
-
-    @Override
-    public QuestArea getQuestArea() {
-        return area;
+    protected QuestArea generateArea(ActivateWaystoneData activeData) {
+        QuestAreaScheme scheme = activeData.getAreaScheme();
+        return new QuestArea(scheme, waystonePosition);
     }
 
     @Override
@@ -114,25 +99,18 @@ public class ActivateWaystoneQuest extends Quest<ActivateWaystoneData> implement
     }
 
     @Override
-    protected void writeQuestData(CompoundNBT nbt) {
-        nbt.putInt("timeLeft", this.timeLeft);
-        nbt.putInt("gracePeriod", this.gracePeriod);
-        nbt.putBoolean("wasInArea", this.wasInArea);
-        if (this.area != null && this.waystonePosition != null) {
-            nbt.put("area", this.area.toNbt());
-            nbt.put("pos", NBTUtil.writeBlockPos(this.waystonePosition));
+    protected void writeAdditionalData(CompoundNBT nbt) {
+        nbt.putInt("timeLeft", timeLeft);
+        if (waystonePosition != null) {
+            nbt.put("pos", NBTUtil.writeBlockPos(waystonePosition));
         }
     }
 
     @Override
-    protected void readQuestData(CompoundNBT nbt) {
-        this.timeLeft = nbt.getInt("timeLeft");
-        this.gracePeriod = nbt.getInt("gracePeriod");
-        this.wasInArea = nbt.getBoolean("wasInArea");
-        if (nbt.contains("area", Constants.NBT.TAG_COMPOUND)) {
-            QuestAreaScheme areaScheme = this.getActiveData().getAreaScheme();
-            this.area = QuestArea.fromNbt(areaScheme, nbt.getCompound("area"));
-            this.waystonePosition = NBTUtil.readBlockPos(nbt.getCompound("pos"));
+    protected void readAddtionalData(CompoundNBT nbt) {
+        timeLeft = nbt.getInt("timeLeft");
+        if (nbt.contains("pos", Constants.NBT.TAG_COMPOUND)) {
+            waystonePosition = NBTUtil.readBlockPos(nbt.getCompound("pos"));
         }
     }
 
@@ -141,28 +119,14 @@ public class ActivateWaystoneQuest extends Quest<ActivateWaystoneData> implement
         Interval.IFormatFactory format = f -> f.src(Interval.Unit.TICK).out(Interval.Unit.MINUTE, Interval.Unit.SECOND).compact();
         model.addQuestHeader(this, false);
         model.addInformationRow(TEXT_PROTECTION, this, q -> new StringTextComponent(Interval.format(timeLeft, format)));
-        model.addInformationRow(QuestArea.STAY_IN_AREA, this, this::fillAreaInfo);
+        fillAreaDataModel(model);
     }
 
-    private TriggerResponseStatus onTick(Trigger trigger, IPropertyReader reader) {
-        if (area == null) return TriggerResponseStatus.PASS;
-        PlayerEntity player = reader.getProperty(QuestProperties.PLAYER);
-        if (area.isInArea(player)) {
-            wasInArea = true;
-            return TriggerResponseStatus.OK;
-        } else {
-            return wasInArea && !isGracePeriod() ? TriggerResponseStatus.FAIL : TriggerResponseStatus.PASS;
-        }
-    }
-
-    private void handleSuccessfulTick(Trigger trigger, IPropertyReader reader) {
+    @Override
+    protected void handleSuccessfulTick(Trigger trigger, IPropertyReader reader) {
         if (--timeLeft < 0) {
             setStatus(QuestStatus.COMPLETED);
         }
-    }
-
-    private TriggerResponseStatus handlePlayerDeath(Trigger trigger, IPropertyReader reader) {
-        return TriggerResponseStatus.FAIL;
     }
 
     private TriggerResponseStatus onBlockBroken(Trigger trigger, IPropertyReader reader) {
@@ -176,21 +140,5 @@ public class ActivateWaystoneQuest extends Quest<ActivateWaystoneData> implement
             return TriggerResponseStatus.FAIL;
         }
         return TriggerResponseStatus.OK;
-    }
-
-    private boolean isGracePeriod() {
-        return gracePeriod > 0;
-    }
-
-    private ITextComponent fillAreaInfo(ActivateWaystoneQuest quest) {
-        PlayerEntity player = quest.player;
-        QuestArea area = quest.area;
-        double distance = area.getDistance(player);
-        int intDist = (int)distance;
-        String text = intDist + "m";
-        int size = area.getScheme().getSize();
-        boolean tooClose = size - intDist < 8;
-        TextFormatting color = area.isInArea(player) ? (tooClose ? TextFormatting.YELLOW : TextFormatting.GREEN) : TextFormatting.RED;
-        return new StringTextComponent(text).withStyle(color);
     }
 }
