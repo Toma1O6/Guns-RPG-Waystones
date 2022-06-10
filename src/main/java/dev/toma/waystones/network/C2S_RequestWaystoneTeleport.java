@@ -9,7 +9,11 @@ import dev.toma.waystones.common.world.WaystoneCapabilityProvider;
 import dev.toma.waystones.common.world.WorldWaystones;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class C2S_RequestWaystoneTeleport extends AbstractNetworkPacket<C2S_RequestWaystoneTeleport> {
@@ -53,6 +57,9 @@ public class C2S_RequestWaystoneTeleport extends AbstractNetworkPacket<C2S_Reque
             int distance = (int) Math.sqrt(startDest.distSqr(targetDest));
             int price = WorldWaystones.getPriceForDistance(distance);
             if (price <= perkProvider.getPoints()) {
+                ServerWorld world = player.getLevel();
+                world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundCategory.MASTER, 1.0F, 1.0F);
+                world.playSound(null, targetDest.getX(), targetDest.getY(), targetDest.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundCategory.MASTER, 1.0F, 1.0F);
                 player.teleportTo(targetDest.getX() + 0.5, targetDest.getY() + 1.5, targetDest.getZ());
                 perkProvider.awardPoints(-price);
             }
