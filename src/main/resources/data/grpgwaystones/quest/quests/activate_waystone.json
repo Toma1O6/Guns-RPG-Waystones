@@ -11,52 +11,48 @@
         "area": {
             "size": 20,
             "distance": 0,
-            "spawnInterval": 50,
+            "spawnInterval": 300,
             "spawners": [
                 {
                     "entity": "minecraft:spider",
-                    "propability": 0.05,
-                    "limit": 3
+                    "weight": 15,
+                    "maxCount": 3
                 },
                 {
                     "entity": "minecraft:zombie",
-                    "propability": 0.05,
-                    "limit": 3
+                    "weight": 20,
+                    "maxCount": 3
                 },
                 {
                     "entity": "minecraft:creeper",
-                    "propability": 0.05,
-                    "limit": 3
+                    "weight": 15,
+                    "maxCount": 2
                 },
                 {
                     "entity": "minecraft:skeleton",
-                    "propability": 0.05,
-                    "limit": 3
+                    "weight": 15,
+                    "maxCount": 2
                 },
                 {
                     "entity": "minecraft:witch",
-                    "propability": 0.05,
-                    "limit": 3
+                    "weight": 10,
+                    "maxCount": 2
                 },
                 {
                     "entity": "minecraft:wither_skeleton",
-                    "propability": 0.05,
-                    "limit": 3
+                    "weight": 15,
+                    "maxCount": 3
                 },
                 {
                     "entity": "gunsrpg:zombie_gunner",
-                    "propability": 0.05,
-                    "limit": 2
+                    "weight": 5
                 },
                 {
                     "entity": "gunsrpg:explosive_skeleton",
-                    "propability": 0.05,
-                    "limit": 2
+                    "weight": 5
                 },
                 {
-                    "entity": "gunsrpg:bloodmoon_golem",
-                    "propability": 0.05,
-                    "limit": 2
+                    "entity": "gunsrpg:bloodmoon_golem"
                 }
             ]
         }
