@@ -11,7 +11,7 @@
         "area": {
             "size": 20,
             "distance": 0,
-            "spawnInterval": 300,
+            "spawnInterval": 250,
             "spawners": [
                 {
                     "entity": "minecraft:spider",
@@ -21,7 +21,15 @@
                 {
                     "entity": "minecraft:zombie",
                     "weight": 20,
-                    "maxCount": 3
+                    "maxCount": 3,
+                    "processors": [
+                        {
+                            "type": "gunsrpg:set_equipment",
+                            "equipment": {
+                                "head": "minecraft:leather_helmet"
+                            }
+                        }
+                    ]
                 },
                 {
                     "entity": "minecraft:creeper",
@@ -31,7 +39,15 @@
                 {
                     "entity": "minecraft:skeleton",
                     "weight": 15,
-                    "maxCount": 2
+                    "maxCount": 2,
+                    "processors": [
+                        {
+                            "type": "gunsrpg:set_equipment",
+                            "equipment": {
+                                "head": "minecraft:leather_helmet"
+                            }
+                        }
+                    ]
                 },
                 {
                     "entity": "minecraft:witch",
