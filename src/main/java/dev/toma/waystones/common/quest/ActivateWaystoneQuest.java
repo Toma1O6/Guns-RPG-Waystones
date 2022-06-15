@@ -118,6 +118,7 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
     protected void fillDataModel(QuestDisplayDataModel model) {
         Interval.IFormatFactory format = f -> f.src(Interval.Unit.TICK).out(Interval.Unit.MINUTE, Interval.Unit.SECOND).compact();
         model.addQuestHeader(this, false);
+        model.addConditionDisplay(this);
         model.addInformationRow(TEXT_PROTECTION, this, q -> new StringTextComponent(Interval.format(timeLeft, format)));
         fillAreaDataModel(model);
     }
