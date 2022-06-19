@@ -65,9 +65,11 @@ public class WaystonesScreen extends Screen {
     protected void init() {
         int third = width / 3;
         int half = width / 2;
+        IPlayerData playerData = PlayerData.getUnsafe(minecraft.player);
         if (requireActivation) {
             int centerY = height / 2;
-            addButton(new Button(third, centerY - 11, third, 20, ACTIVATE, this::activateButtonClicked));
+            Button button = addButton(new Button(third, centerY - 11, third, 20, ACTIVATE, this::activateButtonClicked));
+            button.active = !playerData.getQuests().getActiveQuest().isPresent();
             return;
         }
         int usableHeight = height - 20;
@@ -76,7 +78,6 @@ public class WaystonesScreen extends Screen {
         int heightCorrection = remainder / displayLimit;
         editPanel = addButton(new WaystoneEditPanel(2 * third, 10, third - 10, height - 20));
         minecraft.level.getCapability(WaystoneCapabilityProvider.CAPABILITY).ifPresent(provider -> {
-            IPlayerData playerData = PlayerData.getUnsafe(minecraft.player);
             IPointProvider perkProvider = playerData.getPerkProvider();
             Set<Map.Entry<BlockPos, WaystoneProperties>> entrySet = provider.getRegistryContents();
             this.displaySize = entrySet.size();
