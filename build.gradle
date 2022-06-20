@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0.0.9'
+version = '1.0.0.10'
 group = 'dev.toma.waystones'
 archivesBaseName = "gunsrpg-waystones-${mc_version}"
 

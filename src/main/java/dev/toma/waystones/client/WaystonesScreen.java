@@ -44,6 +44,7 @@ public class WaystonesScreen extends Screen {
 
     private static final ITextComponent TITLE = new StringTextComponent("Waystones");
     private static final ITextComponent ACTIVATE = new TranslationTextComponent("screen.waystones.activate_waystone");
+    private static final ITextComponent COMPLETE_QUEST = new TranslationTextComponent("screen.waystones.complete_quest").withStyle(TextFormatting.RED);
     private static final LazyLoader<ItemStack> ICON = new LazyLoader<>(() -> new ItemStack(ModItems.PERKPOINT_BOOK));
 
     private final BlockPos pos;
@@ -70,6 +71,9 @@ public class WaystonesScreen extends Screen {
             int centerY = height / 2;
             Button button = addButton(new Button(third, centerY - 11, third, 20, ACTIVATE, this::activateButtonClicked));
             button.active = !playerData.getQuests().getActiveQuest().isPresent();
+            if (!button.active) {
+                button.setMessage(COMPLETE_QUEST);
+            }
             return;
         }
         int usableHeight = height - 20;

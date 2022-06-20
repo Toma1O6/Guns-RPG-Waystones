@@ -9,5 +9,6 @@
     "skill.grpgwaystones.waystones.description.0": "Unlocks crafting of Waystone block",
     "skill.grpgwaystones.waystones.description.1": "Teleport through Waystones anywhere you want... for a small cost",
 
-    "screen.waystones.activate_waystone": "Activate waystone"
+    "screen.waystones.activate_waystone": "Activate waystone",
+    "screen.waystones.complete_quest": "! You cannot have active quest !"
 }
