@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 
 public class NetworkManager {
 
-    private static final String VERSION = "grpgwaystones-1.0.5";
+    private static final String VERSION = "grpgwaystones-1.1.0";
     private static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
             .named(new ResourceLocation(Waystones.MODID, "network"))
             .networkProtocolVersion(() -> VERSION)

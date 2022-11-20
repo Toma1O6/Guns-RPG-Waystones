@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0.1'
+version = "${waystones_version}"
 group = 'dev.toma.waystones'
 archivesBaseName = "gunsrpg-waystones-${mc_version}"
 
@@ -63,12 +63,15 @@ repositories {
     maven {
         url = "https://www.cursemaven.com"
     }
+    flatDir {
+        dir 'libs'
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
     compile fg.deobf("curse.maven:configuration-${configuration_projectId}:${configuration_fileId}")
-    compile files("libs/gunsrpg-${mc_version}-${gunsrpg_version}.jar")
+    compile fg.deobf("dev.toma.gunsrpg:gunsrpg-${mc_version}:${gunsrpg_version}")
     testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
 }
 
