@@ -1,0 +1,14 @@
+{
+"block.grpgwaystones.waystone": "Piedra Teletransportadora",
+
+"quest.protect_waystone": "Proteger piedra teletransportadora",
+"quest.activate_waystone.success": "La piedra teletransportadora ha sido activada",
+"quest.activate_waystone.fail": "La activación de la piedra teletransportadora no tuvo éxito",
+
+"skill.grpgwaystones.waystones.title": "Piedras Teletransportadoras",
+"skill.grpgwaystones.waystones.description.0": "Desbloquea la fabricación de bloques de piedra teletransportadora",
+"skill.grpgwaystones.waystones.description.1": "Teletranspórtate a través de las piedras teletransportadoras a cualquier lugar que desees... por un pequeño costo",
+
+"screen.waystones.activate_waystone": "Activar piedra teletransportadora",
+"screen.waystones.complete_quest": "¡No puedes tener una misión activa!"
+}
