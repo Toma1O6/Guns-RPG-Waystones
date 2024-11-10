@@ -13,8 +13,12 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
@@ -24,6 +28,7 @@ public class WaystoneBlock extends Block {
 
     public static final BooleanProperty LOWER = BooleanProperty.create("lower");
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+    private static final ITextComponent OBSTRUCTED = new TranslationTextComponent("message.waystones.obstructed").withStyle(TextFormatting.RED);
 
     public WaystoneBlock(Properties properties) {
         super(properties);
@@ -49,6 +54,8 @@ public class WaystoneBlock extends Block {
             BlockPos above = core.above(2);
             if (world.isEmptyBlock(above) && world.canSeeSky(above)) {
                 world.getCapability(WaystoneCapabilityProvider.CAPABILITY).ifPresent(data -> NetworkManager.sendClientPacket((ServerPlayerEntity) player, new S2C_OpenWaystoneMenuPacket(core, data.serializeNBT())));
+            } else {
+                player.displayClientMessage(OBSTRUCTED, true);
             }
         }
         return ActionResultType.PASS;

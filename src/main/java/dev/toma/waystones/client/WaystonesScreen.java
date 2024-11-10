@@ -9,6 +9,7 @@ import dev.toma.gunsrpg.client.screen.widgets.ContainerWidget;
 import dev.toma.gunsrpg.common.capability.PlayerData;
 import dev.toma.gunsrpg.common.init.ModItems;
 import dev.toma.gunsrpg.common.quests.quest.Quest;
+import dev.toma.gunsrpg.common.quests.sharing.QuestingGroup;
 import dev.toma.gunsrpg.util.ModUtils;
 import dev.toma.gunsrpg.util.RenderUtils;
 import dev.toma.gunsrpg.util.object.LazyLoader;
@@ -48,6 +49,7 @@ public class WaystonesScreen extends Screen {
     private static final ITextComponent TITLE = new StringTextComponent("Waystones");
     private static final ITextComponent ACTIVATE = new TranslationTextComponent("screen.waystones.activate_waystone");
     private static final ITextComponent COMPLETE_QUEST = new TranslationTextComponent("screen.waystones.complete_quest").withStyle(TextFormatting.RED);
+    private static final ITextComponent NOT_A_LEADER = new TranslationTextComponent("command.gunsrpg.exception.not_group_leader").withStyle(TextFormatting.RED);
     private static final LazyLoader<ItemStack> ICON = new LazyLoader<>(() -> new ItemStack(ModItems.PERKPOINT_BOOK));
 
     private final BlockPos pos;
@@ -72,12 +74,21 @@ public class WaystonesScreen extends Screen {
         IQuestingData questing = QuestingDataProvider.getQuesting(this.minecraft.level);
         IPlayerData playerData = PlayerData.getUnsafe(this.minecraft.player);
         Quest<?> active = questing.getActiveQuestForPlayer(this.minecraft.player);
+        QuestingGroup group = questing.getOrCreateGroup(this.minecraft.player);
+        if (!group.isLeader(this.minecraft.player.getUUID()))
+            return;
         if (requireActivation) {
             int centerY = height / 2;
             Button button = addButton(new Button(third, centerY - 11, third, 20, ACTIVATE, this::activateButtonClicked));
-            button.active = active == null;
-            if (!button.active) {
+            if (active != null) {
+                button.active = false;
                 button.setMessage(COMPLETE_QUEST);
+                return;
+            }
+            if (!group.isLeader(this.minecraft.player.getUUID())) {
+                button.active = false;
+                button.setMessage(NOT_A_LEADER);
+                return;
             }
             return;
         }

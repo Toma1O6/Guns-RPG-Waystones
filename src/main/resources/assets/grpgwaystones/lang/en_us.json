@@ -11,6 +11,7 @@
 
     "screen.waystones.activate_waystone": "Activate waystone",
     "screen.waystones.complete_quest": "! You cannot have active quest !",
+    "message.waystones.obstructed": "Waystone is obstructed",
 
     "quest.grpgwaystones.activate_waystone.header": "Waystone Activation",
     "quest.grpgwaystones.activate_waystone.description": "Defend the area for %s",
