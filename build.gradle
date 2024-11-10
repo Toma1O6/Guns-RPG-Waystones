@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -24,7 +24,15 @@ minecraft {
         client {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'info'
+            property 'forge.logging.console.level', 'debug'
+            properties 'mixin.env.remapRefMap': 'true'
+            property 'mixin.env.refMapRemappingFile', "${project.projectDir}/build/createSrgToMcp/output.srg"
+
+            // Workaround for new Mojang Authlib, See https://github.com/FabricMC/fabric-loom/issues/915#issuecomment-1609154390
+            property 'minecraft.api.auth.host', 'https://nope.invalid'
+            property 'minecraft.api.account.host', 'https://nope.invalid'
+            property 'minecraft.api.session.host', 'https://nope.invalid'
+            property 'minecraft.api.services.host', 'https://nope.invalid'
             mods {
                 examplemod {
                     source sourceSets.main
@@ -36,18 +44,14 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'info'
-            mods {
-                examplemod {
-                    source sourceSets.main
-                }
-            }
-        }
+            properties 'mixin.env.remapRefMap': 'true'
+            property 'mixin.env.refMapRemappingFile', "${project.projectDir}/build/createSrgToMcp/output.srg"
 
-        data {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            args '--mod', 'gunsrpg', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            // Workaround for new Mojang Authlib, See https://github.com/FabricMC/fabric-loom/issues/915#issuecomment-1609154390
+            property 'minecraft.api.auth.host', 'https://nope.invalid'
+            property 'minecraft.api.account.host', 'https://nope.invalid'
+            property 'minecraft.api.session.host', 'https://nope.invalid'
+            property 'minecraft.api.services.host', 'https://nope.invalid'
             mods {
                 examplemod {
                     source sourceSets.main
@@ -70,8 +74,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
-    compile fg.deobf("curse.maven:configuration-${configuration_projectId}:${configuration_fileId}")
-    compile fg.deobf("dev.toma.gunsrpg:gunsrpg-${mc_version}:${gunsrpg_version}")
+    implementation fg.deobf("curse.maven:configuration-${configuration_projectId}:${configuration_fileId}")
+    implementation fg.deobf("dev.toma.gunsrpg:gunsrpg-${mc_version}:${gunsrpg_version}")
     testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
 }
 

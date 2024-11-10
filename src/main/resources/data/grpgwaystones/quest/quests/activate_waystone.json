@@ -2,10 +2,6 @@
     "type": "grpgwaystones:activate_waystone",
     "tier": 1,
     "isSpecial": true,
-    "display": {
-        "name": "Waystone activation",
-        "info": "Survive in area for 5 minutes"
-    },
     "data": {
         "duration": "5m",
         "area": {

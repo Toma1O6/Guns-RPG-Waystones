@@ -1,8 +1,6 @@
 package dev.toma.waystones.common.quest;
 
-import dev.toma.gunsrpg.api.common.data.IQuests;
 import dev.toma.gunsrpg.client.render.infobar.QuestDisplayDataModel;
-import dev.toma.gunsrpg.common.capability.PlayerData;
 import dev.toma.gunsrpg.common.init.ModSounds;
 import dev.toma.gunsrpg.common.quests.QuestProperties;
 import dev.toma.gunsrpg.common.quests.quest.*;
@@ -13,20 +11,27 @@ import dev.toma.gunsrpg.common.quests.trigger.Trigger;
 import dev.toma.gunsrpg.common.quests.trigger.TriggerResponseStatus;
 import dev.toma.gunsrpg.util.Interval;
 import dev.toma.gunsrpg.util.properties.IPropertyReader;
+import dev.toma.gunsrpg.world.cap.QuestingDataProvider;
 import dev.toma.waystones.Waystones;
 import dev.toma.waystones.common.init.ModdedBlocks;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.play.server.SPlaySoundEffectPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.*;
+import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.UUID;
@@ -43,8 +48,8 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
     private int timeLeft;
     private BlockPos waystonePosition;
 
-    public ActivateWaystoneQuest(QuestScheme<ActivateWaystoneData> scheme, UUID traderId) {
-        super(scheme, traderId);
+    public ActivateWaystoneQuest(World world, QuestScheme<ActivateWaystoneData> scheme, UUID traderId) {
+        super(world, scheme, traderId);
         this.timeLeft = this.getActiveData().getTicks();
     }
 
@@ -52,11 +57,17 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
         super(context);
     }
 
+    @Override
+    public Object[] getDescriptionArguments() {
+        ActivateWaystoneData data = this.getActiveData();
+        return new Object[] { Interval.format(data.getTicks(), f -> f.src(Interval.Unit.TICK).out(Interval.Unit.HOUR, Interval.Unit.MINUTE, Interval.Unit.SECOND).skipAllEmptyValues()) };
+    }
+
     public void setWaystonePosition(BlockPos waystonePos) {
         this.waystonePosition = waystonePos;
         ActivateWaystoneData data = this.getActiveData();
-        this.area = generateArea(data);
-        trySyncClient();
+        this.area = generateArea(data, this.level);
+        trySyncClient(this.level);
     }
 
     @Override
@@ -65,36 +76,48 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
     }
 
     @Override
-    protected QuestArea generateArea(ActivateWaystoneData activeData) {
+    protected QuestArea generateArea(ActivateWaystoneData activeData, World world) {
         QuestAreaScheme scheme = activeData.getAreaScheme();
         return new QuestArea(scheme, waystonePosition);
     }
 
     @Override
-    public void onCompleted(PlayerEntity player) {
-        if (!player.level.isClientSide) {
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            serverPlayer.connection.send(new SPlaySoundEffectPacket(SoundEvents.PLAYER_LEVELUP, SoundCategory.MASTER, player.getX(), player.getY(), player.getZ(), 0.75F, 1.0F));
-            serverPlayer.sendMessage(ACTIVATE_SUCCESS, ChatType.GAME_INFO, Util.NIL_UUID);
-            PlayerData.get(player).ifPresent(data -> data.getQuests().clearActiveQuest());
-            BlockState state = player.level.getBlockState(waystonePosition);
+    public void onCompleted() {
+        if (!this.level.isClientSide) {
+            this.group.accept(this.level, member -> {
+                ServerPlayerEntity player = (ServerPlayerEntity) member;
+                player.connection.send(new SPlaySoundEffectPacket(SoundEvents.PLAYER_LEVELUP, SoundCategory.MASTER, player.getX(), player.getY(), player.getZ(), 0.75F, 1.0F));
+                player.sendMessage(ACTIVATE_SUCCESS, ChatType.GAME_INFO, Util.NIL_UUID);
+            });
+            BlockState state = this.level.getBlockState(waystonePosition);
             if (state.getBlock() == ModdedBlocks.WAYSTONE) {
-                ModdedBlocks.WAYSTONE.activate(player.level, waystonePosition, state, player);
+                MinecraftServer server = level.getServer();
+                PlayerList playerList = server.getPlayerList();
+                ServerPlayerEntity player = playerList.getPlayer(this.group.getGroupId());
+                if (player != null) {
+                    ModdedBlocks.WAYSTONE.activate(this.level, waystonePosition, player);
+                }
             }
+            QuestingDataProvider.getData(this.level).ifPresent(questing -> {
+                questing.unassignQuest(this.group);
+                questing.sendData();
+            });
         }
     }
 
     @Override
-    public void onFailed(PlayerEntity player) {
-        if (!player.level.isClientSide) {
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            serverPlayer.connection.send(new SPlaySoundEffectPacket(ModSounds.USE_AVENGE_ME_FRIENDS, SoundCategory.MASTER, player.getX(), player.getY(), player.getZ(), 0.75F, 1.0F));
-            serverPlayer.sendMessage(ACTIVATE_FAILURE, ChatType.GAME_INFO, Util.NIL_UUID);
-            PlayerData.get(player).ifPresent((data) -> {
-                IQuests quests = data.getQuests();
-                quests.clearActiveQuest();
+    public void onFailed() {
+        if (!this.level.isClientSide) {
+            this.group.accept(this.level, player -> {
+                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+                serverPlayer.connection.send(new SPlaySoundEffectPacket(ModSounds.USE_AVENGE_ME_FRIENDS, SoundCategory.MASTER, player.getX(), player.getY(), player.getZ(), 0.75F, 1.0F));
+                serverPlayer.sendMessage(ACTIVATE_FAILURE, ChatType.GAME_INFO, Util.NIL_UUID);
             });
-            player.level.destroyBlock(waystonePosition, false);
+            this.level.destroyBlock(waystonePosition, false);
+            QuestingDataProvider.getData(this.level).ifPresent(questing -> {
+                questing.unassignQuest(this.group);
+                questing.sendData();
+            });
         }
     }
 
@@ -118,16 +141,29 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
     protected void fillDataModel(QuestDisplayDataModel model) {
         Interval.IFormatFactory format = f -> f.src(Interval.Unit.TICK).out(Interval.Unit.MINUTE, Interval.Unit.SECOND).compact();
         model.addQuestHeader(this, false);
-        model.addConditionDisplay(this);
-        model.addInformationRow(TEXT_PROTECTION, this, q -> new StringTextComponent(Interval.format(timeLeft, format)));
+        model.addInformationRow(this, q -> TEXT_PROTECTION, q -> new StringTextComponent(Interval.format(timeLeft, format)));
         fillAreaDataModel(model);
     }
 
     @Override
     protected void handleSuccessfulTick(Trigger trigger, IPropertyReader reader) {
-        if (--timeLeft < 0) {
+        PlayerEntity player = reader.getProperty(QuestProperties.PLAYER);
+        World level = reader.getProperty(QuestProperties.LEVEL);
+        if (!level.isClientSide() && !this.group.isLeader(player.getUUID()))
+            return;
+        if (level.isClientSide())
+            if (!shouldTick(player))
+                return;
+        if (timeLeft % 100 == 0)
+            this.requestTemplateFactory.sendSyncRequest();
+        if (--timeLeft < 0)
             setStatus(QuestStatus.COMPLETED);
-        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private boolean shouldTick(PlayerEntity player) {
+        Minecraft client = Minecraft.getInstance();
+        return player == client.player;
     }
 
     private TriggerResponseStatus onBlockBroken(Trigger trigger, IPropertyReader reader) {

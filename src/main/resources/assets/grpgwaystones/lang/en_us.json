@@ -10,5 +10,8 @@
     "skill.grpgwaystones.waystones.description.1": "Teleport through Waystones anywhere you want... for a small cost",
 
     "screen.waystones.activate_waystone": "Activate waystone",
-    "screen.waystones.complete_quest": "! You cannot have active quest !"
+    "screen.waystones.complete_quest": "! You cannot have active quest !",
+
+    "quest.grpgwaystones.activate_waystone.header": "Waystone Activation",
+    "quest.grpgwaystones.activate_waystone.description": "Defend the area for %s"
 }

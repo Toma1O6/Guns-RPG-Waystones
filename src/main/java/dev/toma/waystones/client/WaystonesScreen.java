@@ -4,12 +4,15 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.toma.gunsrpg.api.common.data.IPlayerData;
 import dev.toma.gunsrpg.api.common.data.IPointProvider;
+import dev.toma.gunsrpg.api.common.data.IQuestingData;
 import dev.toma.gunsrpg.client.screen.widgets.ContainerWidget;
 import dev.toma.gunsrpg.common.capability.PlayerData;
 import dev.toma.gunsrpg.common.init.ModItems;
+import dev.toma.gunsrpg.common.quests.quest.Quest;
 import dev.toma.gunsrpg.util.ModUtils;
 import dev.toma.gunsrpg.util.RenderUtils;
 import dev.toma.gunsrpg.util.object.LazyLoader;
+import dev.toma.gunsrpg.world.cap.QuestingDataProvider;
 import dev.toma.waystones.WaystoneProperties;
 import dev.toma.waystones.common.world.WaystoneCapabilityProvider;
 import dev.toma.waystones.common.world.WorldWaystones;
@@ -66,11 +69,13 @@ public class WaystonesScreen extends Screen {
     protected void init() {
         int third = width / 3;
         int half = width / 2;
-        IPlayerData playerData = PlayerData.getUnsafe(minecraft.player);
+        IQuestingData questing = QuestingDataProvider.getQuesting(this.minecraft.level);
+        IPlayerData playerData = PlayerData.getUnsafe(this.minecraft.player);
+        Quest<?> active = questing.getActiveQuestForPlayer(this.minecraft.player);
         if (requireActivation) {
             int centerY = height / 2;
             Button button = addButton(new Button(third, centerY - 11, third, 20, ACTIVATE, this::activateButtonClicked));
-            button.active = !playerData.getQuests().getActiveQuest().isPresent();
+            button.active = active == null;
             if (!button.active) {
                 button.setMessage(COMPLETE_QUEST);
             }

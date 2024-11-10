@@ -30,7 +30,7 @@ public class WaystoneBlock extends Block {
         this.registerDefaultState(this.stateDefinition.any().setValue(LOWER, false).setValue(ACTIVE, false));
     }
 
-    public void activate(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public void activate(World world, BlockPos pos, PlayerEntity player) {
         world.destroyBlock(pos, false);
         world.destroyBlock(pos.above(), false);
         world.setBlock(pos, ModdedBlocks.WAYSTONE.defaultBlockState().setValue(LOWER, true).setValue(ACTIVE, true), 3);
