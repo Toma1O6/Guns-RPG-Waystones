@@ -13,5 +13,9 @@
     "screen.waystones.complete_quest": "! You cannot have active quest !",
 
     "quest.grpgwaystones.activate_waystone.header": "Waystone Activation",
-    "quest.grpgwaystones.activate_waystone.description": "Defend the area for %s"
+    "quest.grpgwaystones.activate_waystone.description": "Defend the area for %s",
+
+    "config.screen.grpgwaystones": "GunsRPG: Waystones",
+    "config.grpgwaystones.option.applyGroupDifficultyScaling": "Group difficulty scaling",
+    "config.grpgwaystones.option.scalingPerMember": "Per member scaling"
 }

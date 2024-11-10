@@ -6,6 +6,7 @@ import dev.toma.gunsrpg.common.quests.QuestProperties;
 import dev.toma.gunsrpg.common.quests.quest.*;
 import dev.toma.gunsrpg.common.quests.quest.area.QuestArea;
 import dev.toma.gunsrpg.common.quests.quest.area.QuestAreaScheme;
+import dev.toma.gunsrpg.common.quests.sharing.QuestingGroup;
 import dev.toma.gunsrpg.common.quests.trigger.ITriggerHandler;
 import dev.toma.gunsrpg.common.quests.trigger.Trigger;
 import dev.toma.gunsrpg.common.quests.trigger.TriggerResponseStatus;
@@ -14,6 +15,7 @@ import dev.toma.gunsrpg.util.properties.IPropertyReader;
 import dev.toma.gunsrpg.world.cap.QuestingDataProvider;
 import dev.toma.waystones.Waystones;
 import dev.toma.waystones.common.init.ModdedBlocks;
+import dev.toma.waystones.config.WaystonesConfig;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -45,16 +47,30 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
     public static final ITextComponent ACTIVATE_SUCCESS = new TranslationTextComponent("quest.activate_waystone.success").withStyle(TextFormatting.GREEN);
     public static final ITextComponent ACTIVATE_FAILURE = new TranslationTextComponent("quest.activate_waystone.fail").withStyle(TextFormatting.RED);
 
+    private int baseTime;
     private int timeLeft;
     private BlockPos waystonePosition;
 
     public ActivateWaystoneQuest(World world, QuestScheme<ActivateWaystoneData> scheme, UUID traderId) {
         super(world, scheme, traderId);
-        this.timeLeft = this.getActiveData().getTicks();
+        this.baseTime = this.getActiveData().getTicks();
+        this.timeLeft = this.baseTime;
     }
 
     public ActivateWaystoneQuest(QuestDeserializationContext<ActivateWaystoneData> context) {
         super(context);
+    }
+
+    @Override
+    protected void onAssigned(QuestingGroup group) {
+        this.onAreaEntered();
+    }
+
+    @Override
+    protected void onAreaEntered() {
+        WaystonesConfig config = Waystones.config;
+        int multiplier = this.group != null ? this.group.getMemberCount() - 1 : 0;
+        this.timeLeft = config.applyGroupDifficultyScaling ? this.baseTime + multiplier * config.scalingPerMember : this.baseTime;
     }
 
     @Override
@@ -123,6 +139,7 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
 
     @Override
     protected void writeAdditionalData(CompoundNBT nbt) {
+        nbt.putInt("base", baseTime);
         nbt.putInt("timeLeft", timeLeft);
         if (waystonePosition != null) {
             nbt.put("pos", NBTUtil.writeBlockPos(waystonePosition));
@@ -131,6 +148,7 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
 
     @Override
     protected void readAddtionalData(CompoundNBT nbt) {
+        baseTime = nbt.getInt("base");
         timeLeft = nbt.getInt("timeLeft");
         if (nbt.contains("pos", Constants.NBT.TAG_COMPOUND)) {
             waystonePosition = NBTUtil.readBlockPos(nbt.getCompound("pos"));

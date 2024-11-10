@@ -1,5 +1,7 @@
 package dev.toma.waystones;
 
+import dev.toma.configuration.Configuration;
+import dev.toma.configuration.config.format.ConfigFormats;
 import dev.toma.gunsrpg.GunsRPG;
 import dev.toma.gunsrpg.api.common.data.IQuestingData;
 import dev.toma.gunsrpg.common.quests.quest.QuestTypes;
@@ -15,6 +17,7 @@ import dev.toma.waystones.common.world.IWaystoneProvider;
 import dev.toma.waystones.common.world.WaystoneCapabilityProvider;
 import dev.toma.waystones.common.world.WaystoneDataStorage;
 import dev.toma.waystones.common.world.WorldWaystones;
+import dev.toma.waystones.config.WaystonesConfig;
 import dev.toma.waystones.network.NetworkManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
@@ -38,7 +41,10 @@ public class Waystones {
     public static final Trigger BLOCK_DESTROYED = Trigger.create();
     public static final PropertyKey<BlockState> BLOCKSTATE = PropertyKey.newKey("blockstate");
 
+    public static WaystonesConfig config;
+
     public Waystones() {
+        config = Configuration.registerConfig(WaystonesConfig.class, ConfigFormats.yaml()).getConfigInstance();
         QuestTypes.register(new ResourceLocation(MODID, "activate_waystone"), new ActivateWaystoneData.Serializer(), ActivateWaystoneQuest.FACTORY);
 
         IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
