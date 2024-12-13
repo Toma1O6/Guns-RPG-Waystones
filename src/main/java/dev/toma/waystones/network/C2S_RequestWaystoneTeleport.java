@@ -60,7 +60,9 @@ public class C2S_RequestWaystoneTeleport extends AbstractNetworkPacket<C2S_Reque
                 world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundCategory.MASTER, 1.0F, 1.0F);
                 world.playSound(null, targetDest.getX(), targetDest.getY(), targetDest.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundCategory.MASTER, 1.0F, 1.0F);
                 player.teleportTo(targetDest.getX() + 0.5, targetDest.getY() + 1.5, targetDest.getZ());
-                perkProvider.awardPoints(-price);
+                if (price > 0) {
+                    perkProvider.addPoints(-price);
+                }
             }
         });
     }

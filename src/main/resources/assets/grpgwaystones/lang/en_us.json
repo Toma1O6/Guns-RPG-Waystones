@@ -18,5 +18,6 @@
 
     "config.screen.grpgwaystones": "GunsRPG: Waystones",
     "config.grpgwaystones.option.applyGroupDifficultyScaling": "Group difficulty scaling",
-    "config.grpgwaystones.option.scalingPerMember": "Per member scaling"
+    "config.grpgwaystones.option.scalingPerMember": "Per member scaling",
+    "config.grpgwaystones.option.waystoneTravelPriceScaleStep": "Travelled distance price step"
 }

@@ -29,7 +29,6 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Matrix4f;
@@ -118,14 +117,14 @@ public class WaystonesScreen extends Screen {
                 Map.Entry<BlockPos, WaystoneProperties> entry = sortedList.get(i);
                 int j = i - offset;
                 WaystoneProperties properties = entry.getValue();
-                WaystoneWidget widget = new WaystoneWidget(10, 10 + j * 25 + heightCorrection, half, 20, entry.getKey(), properties, minecraft.player, this::handleWaystoneButtonClick);
+                WaystoneWidget widget = new WaystoneWidget(10, 10 + j * 25 + heightCorrection, half, 20, entry.getKey(), properties, this::handleWaystoneButtonClick, pos);
                 widget.active = perkProvider.getPoints() >= widget.price;
                 addButton(widget);
             }
 
             WaystoneProperties currentWaystone = provider.getWaystoneData(pos);
             if (currentWaystone.isOwner(minecraft.player)) {
-                this.editPanel.setEditingWaystone(new WaystoneWidget(0, 0, 0, 0, pos, currentWaystone, minecraft.player, w -> {}));
+                this.editPanel.setEditingWaystone(new WaystoneWidget(0, 0, 0, 0, pos, currentWaystone, w -> {}, pos));
             }
             this.perkPointCount = perkProvider.getPoints();
         });
@@ -172,6 +171,7 @@ public class WaystonesScreen extends Screen {
     private static final class WaystoneWidget extends Widget {
 
         private final BlockPos waystonePosition;
+        private final BlockPos sourcePosition;
         private final WaystoneProperties properties;
         private final Consumer<WaystoneWidget> clickResponder;
         private final int price;
@@ -179,12 +179,13 @@ public class WaystonesScreen extends Screen {
         private final ITextComponent distComponent;
         private final ITextComponent priceComponent;
 
-        public WaystoneWidget(int x, int y, int width, int height, BlockPos pos, WaystoneProperties props, PlayerEntity player, Consumer<WaystoneWidget> clickResponder) {
+        public WaystoneWidget(int x, int y, int width, int height, BlockPos pos, WaystoneProperties props, Consumer<WaystoneWidget> clickResponder, BlockPos sourcePos) {
             super(x, y, width, height, props.getDisplayComponent());
             this.waystonePosition = pos;
+            this.sourcePosition = sourcePos;
             this.properties = props;
             this.clickResponder = clickResponder;
-            int distanceMeters = (int) (Math.sqrt(pos.distSqr(player.blockPosition())));
+            int distanceMeters = (int) (Math.sqrt(pos.distSqr(sourcePos)));
             this.price = WorldWaystones.getPriceForDistance(distanceMeters);
             this.icon = new ItemStack(ModItems.PERKPOINT_BOOK);
             this.distComponent = new StringTextComponent(TextFormatting.GREEN + "[" + TextFormatting.YELLOW + distanceMeters + "m" + TextFormatting.GREEN + "]");
@@ -213,11 +214,14 @@ public class WaystonesScreen extends Screen {
             float centerY = 1.0F + y + (height - font.lineHeight) / 2.0F;
             font.draw(matrix, properties.getDisplayComponent(), x + 5, centerY, 0xFFFFFF);
 
-            ItemRenderer renderer = minecraft.getItemRenderer();
-            renderer.renderGuiItem(icon, x + width - 19, y + 2);
+            int priceWidth = 0;
+            if (this.price > 0) {
+                ItemRenderer renderer = minecraft.getItemRenderer();
+                renderer.renderGuiItem(icon, x + width - 19, y + 2);
 
-            int priceWidth = font.width(priceComponent);
-            font.draw(matrix, priceComponent, x + width - 22 - priceWidth, centerY, 0xFFFFFF);
+                priceWidth = font.width(priceComponent);
+                font.draw(matrix, priceComponent, x + width - 22 - priceWidth, centerY, 0xFFFFFF);
+            }
 
             int distanceWidth = font.width(distComponent);
             font.draw(matrix, distComponent, x + width - 22 - priceWidth - distanceWidth - 10, centerY, 0xFFFFFF);

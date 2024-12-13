@@ -87,6 +87,11 @@ public class ActivateWaystoneQuest extends AbstractAreaBasedQuest<ActivateWaysto
     }
 
     @Override
+    public boolean isStarted() {
+        return true;
+    }
+
+    @Override
     protected void registerAdditionalTriggers(ITriggerRegistration registration) {
         registration.addEntry(Waystones.BLOCK_DESTROYED, this::onBlockBroken, ITriggerHandler.NONE);
     }

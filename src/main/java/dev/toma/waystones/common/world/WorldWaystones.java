@@ -1,6 +1,7 @@
 package dev.toma.waystones.common.world;
 
 import dev.toma.waystones.WaystoneProperties;
+import dev.toma.waystones.Waystones;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -14,8 +15,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public class WorldWaystones implements IWaystoneProvider {
-
-    public static final int PRICE_SCALING = 500;
 
     private final Map<BlockPos, WaystoneProperties> map = new HashMap<>();
 
@@ -69,8 +68,12 @@ public class WorldWaystones implements IWaystoneProvider {
     }
 
     public static int getPriceForDistance(int distance) {
-        int base = distance / PRICE_SCALING;
-        int extra = distance % PRICE_SCALING;
+        int scaling = Waystones.config.waystoneTravelPriceScaleStep;
+        if (scaling == 0) {
+            return 0;
+        }
+        int base = distance / scaling;
+        int extra = distance % scaling;
         if (extra > 0) {
             ++base;
         }
